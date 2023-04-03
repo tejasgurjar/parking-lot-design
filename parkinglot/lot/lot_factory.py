@@ -4,7 +4,8 @@ from enum import Enum
 from lot.lot import Lot
 from feemodel.fee_model_types import FeeModelTypes
 from feemodel.flat_fee_model import FlatFeeModel
-from feemodel.interval_fee_model import IntervalFeeModel
+from feemodel.interval_fee_model import HourlyIntervalFeeModel
+from feemodel.daily_fee_model import DailyFeeModel
 
 
 class Places(Enum):
@@ -21,8 +22,8 @@ class LotFactory(object):
     factory_instance = None
     fee_model_map = dict({
         FeeModelTypes.FLAT_HOURLY: FlatFeeModel(),
-        FeeModelTypes.INTERVAL_HOURLY: IntervalHourlyFeeModel(),
-        FeeModelTypes.INTERVAL_DAILY: IntervalDailyFeeModel()
+        FeeModelTypes.INTERVAL_HOURLY: HourlyIntervalFeeModel(),
+        FeeModelTypes.INTERVAL_DAILY: DailyFeeModel()
      }
     )
 

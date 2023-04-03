@@ -53,7 +53,10 @@ class Lot(object):
         return self.available_slot_count[slot_type]
 
     def get_slot_capacity(self, slot_type):
-        return self.slot_capacity_cfg[slot_type]
+        if slot_type in self.slot_capacity_cfg:
+            return self.slot_capacity_cfg[slot_type]
+        else:
+            return 0
 
     def generate_ticket(self, start_datetime):
         ticket_number = self.get_next_ticket_number()

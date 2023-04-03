@@ -1,4 +1,5 @@
 import constants
+from math import ceil
 from feemodel.fee_model import FeeModel
 
 
@@ -9,7 +10,7 @@ class FlatFeeModel(FeeModel):
     def calculate_fee(self, duration, lot, slot_type):
         # flat rate num of hours * hourly rate based on place, vehicle
 
-        hours = duration.seconds/constants.SECONDS_IN_HOUR
+        hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
         hourly_rate = self.rates[slot_type]
         return hourly_rate * hours
 

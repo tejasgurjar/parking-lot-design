@@ -5,7 +5,7 @@ from math import ceil
 
 class DailyFeeModel(FeeModel):
     def __init__(self):
-        self.rates = None
+        self.rates =None
 
     def get_daily_rate(self, slot_type):
         # Use the interval (24, None) to represent daily flat rate
