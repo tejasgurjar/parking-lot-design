@@ -1,40 +1,41 @@
 import constants
 from feemodel.fee_model import FeeModel
+from feemodel.interval_fee_model import IntervalHourlyFeeModel
+from feemodel.flat_fee_model import FlatDailyFeeModel
 from math import ceil
+from datetime import timedelta
 
 
 class DailyFeeModel(FeeModel):
+
+    # Use the interval (24, None) to represent daily flat rate
+    DAILY_FLAT_RATE_INTERVAL = (24, None)
+
     def __init__(self):
-        self.rates =None
+        self.interval_hourly_feemodel = IntervalHourlyFeeModel()
+        self.flat_daily_feemodel = FlatDailyFeeModel()
 
-    def get_daily_rate(self, slot_type):
-        # Use the interval (24, None) to represent daily flat rate
-        return self.rates[slot_type][(24, None)]
+    @classmethod
+    def get_daily_rate(cls, rates, slot_type):
+        return rates[slot_type][cls.DAILY_FLAT_RATE_INTERVAL]
 
-    def find_interval(self, slot_type, num_of_hours):
-        for interval in self.rates[slot_type].keys():
-            if interval[0] <= num_of_hours:
-                if interval[1] is None or interval[1] > num_of_hours:
-                    return interval
+    def set_rate(self, rates):
+        # set hourly interval based rates
+        self.interval_hourly_feemodel.set_rate(rates)
 
-        raise Exception("Duration of parking  provided: " +
-                        str(num_of_hours) +
-                        " but no corresponding time interval slab was defined. Existing intervals are : ",
-                        list(self.rates[slot_type].keys()))
-
-    def calculate_flat_daily_rate(self, slot_type, num_of_hours):
-        num_of_days = ceil(num_of_hours/constants.HOURS_IN_DAY)
-        flat_daily_rate = self.get_daily_rate(slot_type)
-        return flat_daily_rate * num_of_days
+        # set flat daily rates
+        daily_flat_rates = dict()
+        for slot_type in rates.keys():
+            daily_flat_rates[slot_type] = self.get_daily_rate(rates, slot_type)
+        self.flat_daily_feemodel.set_rate(daily_flat_rates)
 
     def calculate_fee(self, duration, lot, slot_type):
-        num_of_hours = duration.seconds/constants.SECONDS_IN_HOUR
-        if num_of_hours < constants.HOURS_IN_DAY:
-            try:
-                interval = self.find_interval(slot_type, num_of_hours)
-                return self.rates[slot_type][interval]
-            except Exception as e:
-                print("Error in calculation of parking fee:" + str(e))
-                raise
+        num_of_hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
+
+        if duration.days is None or duration.days == 0:
+            self.interval_hourly_feemodel.set_rate(self.rates)
+            return self.interval_hourly_feemodel.calculate_fee(timedelta(duration.seconds), lot, slot_type)
+        elif num_of_hours > 0:
+            return self.flat_daily_feemodel.calculate_fee(duration + timedelta(hours=1), lot, slot_type)
         else:
-            return self.calculate_flat_daily_rate(slot_type, num_of_hours)
+            return self.flat_daily_feemodel.calculate_fee(duration, lot, slot_type)

@@ -1,10 +1,6 @@
 import datetime
 import heapq
-from enum import Enum
-from lot.vehicle_slot import VehicleSlot
 from lot.ticket import Ticket
-
-
 from lot.vehicle_slot import SlotType
 
 
@@ -16,19 +12,19 @@ class Lot(object):
 
         self.slots = {
             SlotType.TWO_WHEELER : [],
-            SlotType.LMV: [],
+            SlotType.LV: [],
             SlotType.HV : []
         }
 
         self.available_slots = {
-            SlotType.TWO_WHEELER : heapq.heapify(list(range(self.get_slot_capacity(SlotType.TWO_WHEELER)))),
-            SlotType.LMV: heapq.heapify(list(range(self.get_slot_capacity(SlotType.LMV)))),
-            SlotType.HV: heapq.heapify(list(range(self.get_slot_capacity(SlotType.HV)))),
+            SlotType.TWO_WHEELER : list(range(self.get_slot_capacity(SlotType.TWO_WHEELER))),
+            SlotType.LV: list(range(self.get_slot_capacity(SlotType.LV))),
+            SlotType.HV: list(range(self.get_slot_capacity(SlotType.HV))),
         }
 
         self.available_slot_count = {
             SlotType.TWO_WHEELER : self.get_slot_capacity(SlotType.TWO_WHEELER),
-            SlotType.LMV : self.get_slot_capacity(SlotType.LMV),
+            SlotType.LV : self.get_slot_capacity(SlotType.LV),
             SlotType.HV : self.get_slot_capacity(SlotType.HV)
         }
 
@@ -53,43 +49,42 @@ class Lot(object):
         return self.available_slot_count[slot_type]
 
     def get_slot_capacity(self, slot_type):
-        if slot_type in self.slot_capacity_cfg:
-            return self.slot_capacity_cfg[slot_type]
+        if slot_type.value in self.slot_capacity_cfg:
+            return self.slot_capacity_cfg[slot_type.value]
         else:
             return 0
 
-    def generate_ticket(self, start_datetime):
+    def generate_ticket(self, slot_type, vehicle, start_datetime):
         ticket_number = self.get_next_ticket_number()
-        slot_number = self.get_next_available_slot(self.slot_type)
+        slot_number = self.get_next_available_slot(slot_type)
         ticket = Ticket(ticket_number,
                         slot_number,
-                        self.slot_type,
-                        self.lot.get_fee_model(),
-                        datetime.datetime.fromisoformat(start_datetime))
+                        slot_type,
+                        vehicle,
+                        self.get_fee_model(),
+                        start_datetime)
         self.tickets_created[ticket.ticket_number] = ticket
         return ticket
 
-    def occupy_slot(self, slot_type, start_datetime_string):
+    def occupy_slot(self, slot_type, vehicle, start_datetime_string):
         num_available_slots = self.get_num_of_available_slots(slot_type)
         if num_available_slots > 0:
-            #slot = VehicleSlot(self, slot_type)
             self.available_slot_count[slot_type] -= 1
             start_datetime = Lot.get_datetime(start_datetime_string)
-            ticket = self.generate_ticket(start_datetime)
+            ticket = self.generate_ticket(slot_type, vehicle, start_datetime)
             return ticket
         else:
             raise Exception("No more slots available")
 
     def is_parking_empty(self, slot_type):
         num_available_slots = self.get_num_of_available_slots(slot_type)
-        max_slots = self.get_slot_capacity()
+        max_slots = self.get_slot_capacity(slot_type)
         return num_available_slots == max_slots
 
     def calculate_fee(self, ticket, end_time):
-        fee_model = ticket.lot.get_fee_model()
         duration = end_time - ticket.start_datetime
-        fee = fee_model.calculate_fee(duration, self, ticket.get_slot_type())
-        print("Fee: " + fee)
+        fee = self.fee_model.calculate_fee(duration, self, ticket.get_slot_type())
+        return fee
 
     @classmethod
     def get_datetime(cls, time_string):
@@ -100,7 +95,7 @@ class Lot(object):
             raise
 
     def free_slot(self, ticket, end_time_string):
-        slot_type = ticket.lot.get_slot_type()
+        slot_type = ticket.get_slot_type()
         if self.is_parking_empty(slot_type):
             raise Exception("Parking slot capacity for type " + slot_type + " already at max capacity")
 

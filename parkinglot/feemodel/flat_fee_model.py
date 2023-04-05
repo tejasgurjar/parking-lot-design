@@ -7,10 +7,30 @@ class FlatFeeModel(FeeModel):
     def __init__(self):
         self.rates = None
 
+    def set_rate(self, rates):
+        self.rates = rates
+
     def calculate_fee(self, duration, lot, slot_type):
-        # flat rate num of hours * hourly rate based on place, vehicle
+        # flat rate time spent *  rate based on place, vehicle
+        time_units = self.get_time_units(duration)
+        rate = self.rates[slot_type.value]
+        return rate * time_units
 
-        hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
-        hourly_rate = self.rates[slot_type]
-        return hourly_rate * hours
 
+class FlatHourlyFeeModel(FlatFeeModel):
+    def __init__(self):
+        super().__init__()
+
+    def get_time_units(self, duration):
+        return ceil(duration.seconds/constants.SECONDS_IN_HOUR)
+
+
+class FlatDailyFeeModel(FlatFeeModel):
+    def __init__(self):
+        super().__init__()
+
+    def set_rate(self, rates):
+        self.rates = rates
+
+    def get_time_units(self, duration):
+        return duration.days + ceil(duration.seconds/constants.SECONDS_IN_DAY)

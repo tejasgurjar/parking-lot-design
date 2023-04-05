@@ -3,6 +3,7 @@ import datetime
 
 from enum import Enum
 from config.vehicle_slot_type_cfg import *
+from lot.ticket import Ticket
 from constants import *
 
 
@@ -25,6 +26,7 @@ class Park(Activity):
     def do(self, parking_space, tickets):
         slot_type = vehicle_slot_type_map[self.vehicle]
         ticket = parking_space.occupy_slot(slot_type,
+                                           self.vehicle,
                                            self.datetime_string)
         tickets[ticket.ticket_number] = ticket
 
@@ -39,27 +41,33 @@ class UnPark(Activity):
 
     def do(self, parking_space, tickets):
         slot_type = vehicle_slot_type_map[self.vehicle]
-        ticket_number = "-".join(["T", slot_type, str(self.slot_id)])
+        ticket_number = Ticket.format_ticket_number(slot_type, int(self.slot_id))
         parking_space.free_slot(tickets[ticket_number],
                                 self.datetime_string)
 
 class ActivityConfig(object):
     def __init__(self, configfilepath):
         self.configfilepath = configfilepath
-        self.config = None
-
-    def load(self):
+        self.config = self.load(configfilepath)
         try:
-            with open(self.configfilepath, "r") as cfg:
-                activity_cfg = json.load(cfg)
-                self.config = activity_cfg
+            self.validate()
         except Exception as e:
-            print("Could not load activity config from file:" + self.configfilepath + ":" + str(e))
+            msg = f"Invalid activity configuration provided: {str(e)}"
+            raise Exception(msg)
+
+    @classmethod
+    def load(cls, configfilepath):
+        try:
+            with open(configfilepath, "r") as cfg:
+                activity_cfg = json.load(cfg)
+            return activity_cfg
+        except Exception as e:
+            print("Could not load activity config from file:" + configfilepath + ":" + str(e))
             raise
 
     @classmethod
     def validate_action(cls, action):
-        if action.upper() not in Action.__members:
+        if action.upper() not in Action.__members__:
             err_msg = "Illegal action value: " + action + \
                       " must be " + "".join([i for i in Action.__members__])
             raise Exception(err_msg)
@@ -84,13 +92,12 @@ class ActivityConfig(object):
 
     def validate(self):
         common_mandatory_params = [ACTION, VEHICLE, DATETIME]
-
         errors = list()
 
         for act_id, activity in enumerate(self.config):
             mandatory_params = common_mandatory_params[:]
 
-            if activity[ACTION] == Action.UNPARK:
+            if activity[ACTION].lower() == Action.UNPARK.value:
                 mandatory_params.append(SLOTID)
 
             for mandatory_param in mandatory_params:
@@ -112,42 +119,32 @@ class ActivityConfig(object):
             except Exception as e:
                 errors.append(str(e))
 
-        return not errors
+        if errors:
+            raise Exception("Invalid activity config: " + "\n".join(errors))
 
     def get_activity(self):
         activity_objs = []
+
         for act_cfg in self.config:
             if act_cfg[ACTION].lower() == Action.PARK.value:
-
                 activity_objs.append(Park(act_cfg[ACTION],
                                           act_cfg[VEHICLE],
                                           act_cfg[DATETIME]))
 
-            elif act_cfg[ACTION].upper() == Action.UNPARK.value:
+            elif act_cfg[ACTION].lower() == Action.UNPARK.value:
                 activity_obj = UnPark(act_cfg[ACTION],
                                       act_cfg[VEHICLE],
                                       act_cfg[DATETIME])
                 activity_obj.set_slot_id(act_cfg[SLOTID])
-                activity_objs.append()
+                activity_objs.append(activity_obj)
         return activity_objs
-
-    def __init__(self, configfilepath):
-        activity_cfg = ActivityConfig.load(configfilepath)
-
-        try:
-            self.validate(activity_cfg)
-        except Exception as e:
-            print("Invalid activity configuration provided:", str(e))
-            raise
-        else:
-            self.activity_cfg = activity_cfg
 
 
 class ParkingSimulator(object):
-    def __init__(self, lot, activity_cconfig_filepath):
+    def __init__(self, lot, activity_config_filepath):
         self.lot = lot
 
-        activity_config = ActivityConfig(activity_cconfig_filepath)
+        activity_config = ActivityConfig(activity_config_filepath)
         activity_config.validate()
         self.activities = activity_config.get_activity()
 

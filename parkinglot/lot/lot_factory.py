@@ -1,10 +1,9 @@
 import os
-import json
 from enum import Enum
 from lot.lot import Lot
 from feemodel.fee_model_types import FeeModelTypes
-from feemodel.flat_fee_model import FlatFeeModel
-from feemodel.interval_fee_model import HourlyIntervalFeeModel
+from feemodel.flat_fee_model import FlatFeeModel, FlatHourlyFeeModel
+from feemodel.interval_fee_model import IntervalHourlyFeeModel
 from feemodel.daily_fee_model import DailyFeeModel
 
 
@@ -21,9 +20,9 @@ class Places(Enum):
 class LotFactory(object):
     factory_instance = None
     fee_model_map = dict({
-        FeeModelTypes.FLAT_HOURLY: FlatFeeModel(),
-        FeeModelTypes.INTERVAL_HOURLY: HourlyIntervalFeeModel(),
-        FeeModelTypes.INTERVAL_DAILY: DailyFeeModel()
+        FeeModelTypes.FLAT_HOURLY.value: FlatHourlyFeeModel(),
+        FeeModelTypes.INTERVAL_HOURLY.value: IntervalHourlyFeeModel(),
+        FeeModelTypes.INTERVAL_DAILY.value: DailyFeeModel()
      }
     )
 
@@ -35,8 +34,12 @@ class LotFactory(object):
         if not os.path.exists(configfilepath):
             raise Exception("Parking lot config file " + configfilepath + " does not exist")
         try:
+            cfg_code = []
             with open(configfilepath, "r") as cfg:
-                cfg_obj = json.load(cfg)
+                #cfg_obj = json.load(cfg)
+                for code_line in cfg.readlines():
+                    cfg_code.append(code_line)
+            cfg_obj = eval("".join(cfg_code))
         except Exception as e:
             print("Error reading parking lot configuration file " + configfilepath + " error: " + str(e))
             raise
@@ -51,17 +54,16 @@ class LotFactory(object):
 
         return cls.factory_instance
 
-    @classmethod
-    def get_fee_model(cls, place):
-        if place in cls.config["lot_config"]:
-            fee_model_type = cls.config["lot_config"][place]["model"]
-            fee_model = LotFactory.fee_model_map[fee_model_type]
-            fee_model.set_rate(cls.config["lot_config"][place]["rates"])
+    def get_fee_model(self, place):
+        if place in self.config["lot_config"]:
+            fee_model_type = self.config["lot_config"][place]["fee_model"]
+            fee_model = self.fee_model_map[fee_model_type.lower()]
+            fee_model.set_rate(self.config["lot_config"][place]["rates"])
+            return fee_model
         else:
             raise Exception("Invalid place specified:" + place + " Legal places are:" + Places.get_legal_values())
 
-    @classmethod
-    def get_parking_lot(cls, place):
-        lot = Lot(cls.get_fee_model(place),
-                  cls.config[place]["slots"])
+    def get_parking_lot(self, place):
+        lot = Lot(self.get_fee_model(place),
+                  self.config["lot_config"][place]["slots"])
         return lot

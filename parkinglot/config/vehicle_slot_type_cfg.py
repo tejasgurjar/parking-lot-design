@@ -1,8 +1,8 @@
 from lot.vehicle_slot import SlotType
 
 vehicle_slot_type_map = {
-    'car': SlotType.LMV,
-    'suv': SlotType.LMV,
+    'car': SlotType.LV,
+    'suv': SlotType.LV,
     'motorcycle': SlotType.TWO_WHEELER,
     'scooter': SlotType.TWO_WHEELER,
     'truck': SlotType.HV,

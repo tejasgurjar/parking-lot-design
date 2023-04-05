@@ -1,6 +1,7 @@
 from enum import Enum
 
+
 class FeeModelTypes(Enum):
-    FLAT_HOURLY=1
-    INTERVAL_HOURLY=2
-    INTERVAL_DAILY=3
+    FLAT_HOURLY='flat_hourly'
+    INTERVAL_HOURLY='interval_hourly'
+    INTERVAL_DAILY='daily'

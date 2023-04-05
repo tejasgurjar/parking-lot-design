@@ -1,44 +1,41 @@
-from lot.vehicle_slot import SlotType
-from feemodel.fee_model_types import FeeModelTypes
-
-default_config = {
+{
     "lot_config": {
         "mall": {
-                    "fee_model": FeeModelTypes.FLAT_HOURLY,
+                    "fee_model": "flat_hourly",
                     "slots": {
-                        SlotType.TWO_WHEELER: 100,
-                        SlotType.LV: 500,
-                        SlotType.HV: 10
+                        "two_wheeler": 100,
+                        "light_vehicle": 500,
+                        "heavy_vehicle": 10
                     },
                     "rates" : {
-                        SlotType.TWO_WHEELER : 10,
-                        SlotType.LV : 20,
-                        SlotType.HV : 100
+                        "two_wheeler" : 10,
+                        "light_vehicle" : 20,
+                        "heavy_vehicle" : 100
                     },
         },
         "airport": {
-                    "fee_model": FeeModelTypes.INTERVAL_DAILY,
+                    "fee_model": "crazy_expensive",
                     "slots": {
-                        SlotType.TWO_WHEELER: 100,
-                        SlotType.LV: 500,
-                        SlotType.HV: 0
+                        "two_wheeler": 100,
+                        "light_vehicle": 500,
+                        "heavy_vehicle": 10
                     },
                     "rates" : {
-                        SlotType.TWO_WHEELER : {
+                        "two_wheeler" : {
                             (0,  4): 50,
                             (4,  7): 100,
                             (7,  12): 500,
                             (12, 24): 500,
                             (24, None): 1000
                         },
-                        SlotType.LV : {
+                        "light_vehicle" : {
                             (0, 4): 150,
                             (4, 7): 600,
                             (7, 12): 1500,
                             (12, 24): 1800,
                             (24, None): 2000
                         },
-                        SlotType.HV : {
+                        "heavy_vehicle" : {
                             (0, 4): 650,
                             (4, 7): 900,
                             (7, 12): 2500,
@@ -46,29 +43,28 @@ default_config = {
                             (24, None): 4000
                         },
                     },
-
         },
         "stadium": {
-            "fee_model": FeeModelTypes.INTERVAL_HOURLY,
+            "fee_model": "tres_cher",
             "slots": {
-                SlotType.TWO_WHEELER: 100,
-                SlotType.LV: 500,
-                SlotType.HV: 10
+                "two_wheeler": 100,
+                "light_vehicle": 500,
+                "heavy_vehicle": 10
             },
             "rates": {
-                SlotType.TWO_WHEELER: {
+                "two_wheeler": {
                     (0, 4): 50,
                     (4, 7): 100,
                     (7, 12): 500,
                     (12, None): 600
                 },
-                SlotType.LV: {
+                "light_vehicle": {
                     (0, 4): 150,
                     (4, 7): 600,
                     (7, 12): 1500,
                     (12, None): 1800
                 },
-                SlotType.HV: {
+                "heavy_vehicle": {
                     (0, 4): 650,
                     (4, 11): 900,
                     (11, 14): 2500,

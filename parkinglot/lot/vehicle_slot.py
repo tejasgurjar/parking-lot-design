@@ -9,7 +9,7 @@ class Status(Enum):
 
 class SlotType(Enum):
     TWO_WHEELER = "two_wheeler"
-    LMV = "light_motor_vehicle"
+    LV = "light_vehicle"
     HV = "heavy_vehicle"
 
 
