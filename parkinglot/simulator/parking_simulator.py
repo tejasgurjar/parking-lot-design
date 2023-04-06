@@ -29,7 +29,7 @@ class Park(Activity):
                                            self.vehicle,
                                            self.datetime_string)
         tickets[ticket.ticket_number] = ticket
-
+        ticket.print()
 
 class UnPark(Activity):
     def __init__(self, action, vehicle, datetime_string):
@@ -42,8 +42,9 @@ class UnPark(Activity):
     def do(self, parking_space, tickets):
         slot_type = vehicle_slot_type_map[self.vehicle]
         ticket_number = Ticket.format_ticket_number(slot_type, int(self.slot_id))
-        parking_space.free_slot(tickets[ticket_number],
-                                self.datetime_string)
+        receipt = parking_space.free_slot(tickets[ticket_number],
+                                          self.datetime_string)
+        receipt.print()
 
 class ActivityConfig(object):
     def __init__(self, configfilepath):

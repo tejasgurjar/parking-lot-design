@@ -23,3 +23,14 @@ class TestParkingSimulator(TestCase):
         sim.simulate()
 
         self.assertTrue(True)
+
+    def test_simulate_airport_parking(self):
+        activity_cfgfile = os.path.join(TESTDIR, self._testMethodName + "_activity_cfg.json")
+        parking_space_cfgfile = os.path.join(TESTDIR, self._testMethodName + "_cfg.py")
+
+        lot_factory = LotFactory.get_instance(parking_space_cfgfile)
+        lot = lot_factory.get_parking_lot(Places.MALL.value)
+        sim = ParkingSimulator(lot, activity_cfgfile)
+        sim.simulate()
+
+        self.assertTrue(True)

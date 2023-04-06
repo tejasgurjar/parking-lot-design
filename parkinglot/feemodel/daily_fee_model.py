@@ -1,6 +1,6 @@
 import constants
 from feemodel.fee_model import FeeModel
-from feemodel.interval_fee_model import IntervalHourlyFeeModel
+from feemodel.interval_fee_model import IntervalHourlyNonCumulativeFeeModel
 from feemodel.flat_fee_model import FlatDailyFeeModel
 from math import ceil
 from datetime import timedelta
@@ -12,7 +12,7 @@ class DailyFeeModel(FeeModel):
     DAILY_FLAT_RATE_INTERVAL = (24, None)
 
     def __init__(self):
-        self.interval_hourly_feemodel = IntervalHourlyFeeModel()
+        self.interval_hourly_feemodel = IntervalHourlyNonCumulativeFeeModel()
         self.flat_daily_feemodel = FlatDailyFeeModel()
 
     @classmethod

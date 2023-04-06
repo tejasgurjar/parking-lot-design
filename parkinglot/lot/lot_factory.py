@@ -65,5 +65,6 @@ class LotFactory(object):
 
     def get_parking_lot(self, place):
         lot = Lot(self.get_fee_model(place),
-                  self.config["lot_config"][place]["slots"])
+                  self.config["lot_config"][place]["slots"],
+                  place=place)
         return lot

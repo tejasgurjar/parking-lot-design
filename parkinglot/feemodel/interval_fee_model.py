@@ -36,6 +36,21 @@ class IntervalHourlyFeeModel(FeeModel):
             raise
 
 
+class IntervalHourlyNonCumulativeFeeModel(IntervalHourlyFeeModel):
+    def __init__(self):
+        self.rates = None
+
+    def calculate_fee(self, duration, lot, slot_type):
+        hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
+        try:
+            interval_id = self.find_interval(slot_type, hours)
+            charge = self.rates[slot_type.value].get_value(interval_id)
+            return charge
+        except Exception as e:
+            print("Error in calculation of parking fee:" + str(e))
+            raise
+
+
 class HourlyFeeModel(FeeModel):
     def __init__(self):
         self.interval_hourly_feemodel = IntervalHourlyFeeModel()

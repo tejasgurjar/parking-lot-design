@@ -1,11 +1,12 @@
 import datetime
 import heapq
 from lot.ticket import Ticket
+from lot.receipt import Receipt
 from lot.vehicle_slot import SlotType
 
 
 class Lot(object):
-    def __init__(self, fee_model, slot_capacity_cfg):
+    def __init__(self, fee_model, slot_capacity_cfg, place):
         self.fee_model = fee_model
         self.slot_capacity_cfg = slot_capacity_cfg
         self.next_ticket_number = 1
@@ -29,6 +30,8 @@ class Lot(object):
         }
 
         self.tickets_created = dict()
+
+        self.place = place
 
     def increment_ticket_number(self):
         self.next_ticket_number += 1
@@ -61,7 +64,7 @@ class Lot(object):
                         slot_number,
                         slot_type,
                         vehicle,
-                        self.get_fee_model(),
+                        self,
                         start_datetime)
         self.tickets_created[ticket.ticket_number] = ticket
         return ticket
@@ -106,8 +109,4 @@ class Lot(object):
 
         # Add slot back to available pool
         heapq.heappush(self.available_slots[slot_type], ticket.id)
-
-        print(ticket.ticket_number + "\n")
-        print("Parking entry:", ticket.start_datetime)
-        print("Parking exit:", ticket.end_datetime)
-        print("Fee: ", fee, "\n")
+        return Receipt(ticket, end_time, fee)

@@ -12,16 +12,18 @@ class Ticket(object):
         self.paid_status = False
 
     @classmethod
-    def format_ticket_number(cls, slot_type, id):
-        return "-".join(["T", slot_type.value,  "%06d" % (id)])
+    def get_ticket_number(cls, slot_type, id):
+        return "-".join([slot_type.value,  "%06d" % (id)])
 
+    @classmethod
+    def format_ticket_number(cls, slot_type, id):
+        return "-".join(["T", cls.get_ticket_number(slot_type, id)])
 
     def get_slot_type(self):
         return self.slot_type
 
     def print(self):
-        print("Date: " + self.end_datetime)
-        print("Parking Lot:" + self.lot)
+        print("Ticket:" + self.format_ticket_number(self.slot_type, self.id))
+        print("Parking Lot:" + self.lot.place)
         print("Vehicle Type: " + self.vehicle)
-        print("Entry date time:" + self.start_datetime)
-
+        print("Entry date time:" + self.start_datetime.isoformat())
