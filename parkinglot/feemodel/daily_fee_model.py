@@ -21,6 +21,7 @@ class DailyFeeModel(FeeModel):
 
     def set_rate(self, rates):
         # set hourly interval based rates
+        self.rates = rates
         self.interval_hourly_feemodel.set_rate(rates)
 
         # set flat daily rates

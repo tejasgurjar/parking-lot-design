@@ -30,7 +30,6 @@ class Lot(object):
         }
 
         self.tickets_created = dict()
-
         self.place = place
 
     def increment_ticket_number(self):
@@ -66,7 +65,7 @@ class Lot(object):
                         vehicle,
                         self,
                         start_datetime)
-        self.tickets_created[ticket.ticket_number] = ticket
+        self.tickets_created[ticket.get_ticket_number_formatted()] = ticket
         return ticket
 
     def occupy_slot(self, slot_type, vehicle, start_datetime_string):

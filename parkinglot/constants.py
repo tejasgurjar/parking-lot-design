@@ -5,4 +5,4 @@ SECONDS_IN_DAY=HOURS_IN_DAY*SECONDS_IN_HOUR
 ACTION="action"
 VEHICLE="vehicle"
 DATETIME="datetime"
-SLOTID = "slot_id"
+TICKET_ID = "ticket_id"

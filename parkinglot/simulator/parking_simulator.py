@@ -28,8 +28,9 @@ class Park(Activity):
         ticket = parking_space.occupy_slot(slot_type,
                                            self.vehicle,
                                            self.datetime_string)
-        tickets[ticket.get_formatted_ticket_number()] = ticket
+        tickets[ticket.get_ticket_number_formatted()] = ticket
         ticket.print()
+
 
 class UnPark(Activity):
     def __init__(self, action, vehicle, datetime_string):
@@ -99,7 +100,7 @@ class ActivityConfig(object):
             mandatory_params = common_mandatory_params[:]
 
             if activity[ACTION].lower() == Action.UNPARK.value:
-                mandatory_params.append(SLOTID)
+                mandatory_params.append(TICKET_ID)
 
             for mandatory_param in mandatory_params:
                 if mandatory_param not in activity:
@@ -136,7 +137,7 @@ class ActivityConfig(object):
                 activity_obj = UnPark(act_cfg[ACTION],
                                       act_cfg[VEHICLE],
                                       act_cfg[DATETIME])
-                activity_obj.set_slot_id(act_cfg[SLOTID])
+                activity_obj.set_slot_id(act_cfg[TICKET_ID])
                 activity_objs.append(activity_obj)
         return activity_objs
 

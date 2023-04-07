@@ -29,7 +29,7 @@ class TestParkingSimulator(TestCase):
         parking_space_cfgfile = os.path.join(TESTDIR, self._testMethodName + "_cfg.py")
 
         lot_factory = LotFactory.get_instance(parking_space_cfgfile)
-        lot = lot_factory.get_parking_lot(Places.MALL.value)
+        lot = lot_factory.get_parking_lot(Places.AIRPORT.value)
         sim = ParkingSimulator(lot, activity_cfgfile)
         sim.simulate()
 

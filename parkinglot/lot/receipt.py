@@ -4,17 +4,18 @@ class Receipt(object):
         self.fee = fee
         self.end_datetime = end_time
 
-    def format_ticket_number(self, slot_type, id):
-        return "-".join(["R", self.ticket.get_ticket_number()])
+    def format_ticket_number(self):
+        return "-".join(["R", self.ticket.get_ticket_number_formatted()])
 
     def get_slot_type(self):
         return self.slot_type
 
     def print(self):
-        print("Parking Lot:" + self.ticket.lot.place)
-        print("Vehicle Type: " + self.ticket.vehicle)
-        print("Entry date time:" + self.ticket.start_datetime.isoformat())
-        print("Exit date time:" + self.end_datetime.isoformat())
-        print("Fee: " + str(self.fee))
+        print("Receipt: " + self.format_ticket_number())
+        print("  Parking Lot:" + self.ticket.lot.place)
+        print("  Vehicle Type: " + self.ticket.vehicle)
+        print("  Entry date time:" + self.ticket.start_datetime.isoformat())
+        print("  Exit date time:" + self.end_datetime.isoformat())
+        print("  Fee: " + str(self.fee))
 
 
