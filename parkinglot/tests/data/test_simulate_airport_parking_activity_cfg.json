@@ -40,7 +40,7 @@
     {
         "action": "unpark",
         "vehicle": "car",
-        "slot_id": "1",
+        "ticket_id": "4",
         "datetime": "2022-04-01 14:00:34"
     },
     {
@@ -58,13 +58,13 @@
     {
         "action": "unpark",
         "vehicle": "suv",
-        "ticket_id": "2",
+        "ticket_id": "5",
         "datetime": "2022-04-02 13:59:34"
     },
     {
         "action": "unpark",
         "vehicle": "car",
         "datetime": "2022-04-04 14:29:06",
-        "ticket_id" : "3"
+        "ticket_id" : "6"
     }
 ]
