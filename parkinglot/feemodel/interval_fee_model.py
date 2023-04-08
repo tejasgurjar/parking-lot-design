@@ -81,7 +81,6 @@ class HourlyFeeModel(FeeModel):
             if interval[1] is not None:
                 continue
             else:
-                #TODO: Add validation to ensure at least one interval with INF exists
                 return rates[slot_type][interval]
 
     def set_rate(self, rates):

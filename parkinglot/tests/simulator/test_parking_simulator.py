@@ -52,7 +52,7 @@ class TestParkingSimulator(TestCase):
         lot = lot_factory.get_parking_lot()
         sim = ParkingSimulator(lot, self.activity_cfg)
 
-        self.assertRaisesRegexp(Exception, "No space available", sim.simulate)
+        self.assertRaisesRegex(Exception, "No space available", sim.simulate)
 
     def test_simulate_parking_empty(self):
         parking_space_cfgfile = os.path.join(TESTDIR, self._testMethodName + "_cfg.py")
@@ -61,5 +61,5 @@ class TestParkingSimulator(TestCase):
         lot = lot_factory.get_parking_lot()
         sim = ParkingSimulator(lot, self.activity_cfg)
 
-        self.assertRaisesRegexp(Exception, "Ticket number T-\d+ was never allotted", sim.simulate)
+        self.assertRaisesRegex(Exception, "Ticket number T-\d+ was never allotted", sim.simulate)
 

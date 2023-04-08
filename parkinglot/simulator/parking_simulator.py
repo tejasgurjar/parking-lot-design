@@ -4,6 +4,7 @@ import datetime
 from enum import Enum
 from config.vehicle_slot_type_cfg import *
 from lot.lot_factory import Places
+from vehicle.vehicle_factory import VehicleFactory
 from lot.ticket import Ticket
 from constants import *
 
@@ -18,38 +19,6 @@ class Activity(object):
         self.action = action
         self.vehicle = vehicle
         self.datetime_string = datetime_string
-
-
-class Park(Activity):
-    def __init__(self, action, vehicle, datetime_string):
-        super().__init__(action, vehicle, datetime_string)
-
-    def do(self, parking_space, tickets):
-        slot_type = vehicle_slot_type_map[self.vehicle]
-        ticket = parking_space.occupy_slot(slot_type,
-                                           self.vehicle,
-                                           self.datetime_string)
-        tickets[ticket.get_ticket_number_formatted()] = ticket
-        ticket.print()
-
-
-class UnPark(Activity):
-    def __init__(self, action, vehicle, datetime_string):
-        super().__init__(action, vehicle, datetime_string)
-        self.ticket_id = None
-
-    def set_ticket_id(self, tkt_id):
-        self.ticket_id = tkt_id
-
-    def do(self, parking_space, tickets):
-        slot_type = vehicle_slot_type_map[self.vehicle]
-        ticket_number = Ticket.create_formatted_ticket_number(int(self.ticket_id))
-        if ticket_number in tickets:
-            receipt = parking_space.free_slot(tickets[ticket_number],
-                                              self.datetime_string)
-            receipt.print()
-        else:
-            raise Exception(f"Ticket number {ticket_number} was never allotted")
 
 
 class ActivityConfig(object):
@@ -134,35 +103,43 @@ class ActivityConfig(object):
             raise Exception("Invalid activity config: " + "\n".join(errors))
 
     def get_activity(self):
-        activity_objs = []
+        return self.config[ACTIVITY]
 
-        for act_cfg in self.config[ACTIVITY]:
-            if act_cfg[ACTION].lower() == Action.PARK.value:
-                activity_objs.append(Park(act_cfg[ACTION],
-                                          act_cfg[VEHICLE],
-                                          act_cfg[DATETIME]))
-
-            elif act_cfg[ACTION].lower() == Action.UNPARK.value:
-                activity_obj = UnPark(act_cfg[ACTION],
-                                      act_cfg[VEHICLE],
-                                      act_cfg[DATETIME])
-                activity_obj.set_ticket_id(act_cfg[TICKET_ID])
-                activity_objs.append(activity_obj)
-        return activity_objs
 
     def get_location(self):
         return self.config[LOCATION]
 
+
 class ParkingSimulator(object):
     def __init__(self, lot, activity_config):
         self.lot = lot
+        self.vehicleFactory = VehicleFactory.get_instance()
         self.activities = activity_config.get_activity()
+        self.vehicles = dict()
+        self.tickets = dict()
 
     def simulate(self):
-        tickets = dict()
-
         for activity in self.activities:
-            activity.do(self.lot, tickets)
+            vehicle_type = activity[VEHICLE]
+            datetime_string = activity[DATETIME]
+
+            if activity[ACTION] == Action.PARK.value:
+                vhc = self.vehicleFactory.get_vehicle(vehicle_type, self.lot)
+
+                ticket = vhc.park(datetime_string)
+                ticket_number = ticket.get_ticket_number_formatted()
+                self.tickets[ticket_number] = ticket
+                self.vehicles[ticket_number] = vhc
+                ticket.print()
+            elif activity[ACTION] == Action.UNPARK.value:
+                ticket_id = activity[TICKET_ID]
+                ticket_number = Ticket.create_formatted_ticket_number(int(ticket_id))
+                if ticket_number in self.tickets:
+                    vhc = self.vehicles[ticket_number]
+                    receipt = vhc.unpark(self.tickets[ticket_number], datetime_string)
+                    receipt.print()
+                else:
+                    raise Exception(f"Ticket number {ticket_number} was never allotted")
 
 
 
