@@ -30,13 +30,13 @@ class DailyFeeModel(FeeModel):
             daily_flat_rates[slot_type] = self.get_daily_rate(rates, slot_type)
         self.flat_daily_feemodel.set_rate(daily_flat_rates)
 
-    def calculate_fee(self, duration, lot, slot_type):
+    def calculate_fee(self, duration, slot_type):
         num_of_hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
 
         if duration.days is None or duration.days == 0:
             self.interval_hourly_feemodel.set_rate(self.rates)
-            return self.interval_hourly_feemodel.calculate_fee(timedelta(duration.seconds), lot, slot_type)
+            return self.interval_hourly_feemodel.calculate_fee(duration, slot_type)
         elif num_of_hours > 0:
-            return self.flat_daily_feemodel.calculate_fee(duration + timedelta(hours=1), lot, slot_type)
+            return self.flat_daily_feemodel.calculate_fee(duration + timedelta(hours=1), slot_type)
         else:
-            return self.flat_daily_feemodel.calculate_fee(duration, lot, slot_type)
+            return self.flat_daily_feemodel.calculate_fee(duration, slot_type)

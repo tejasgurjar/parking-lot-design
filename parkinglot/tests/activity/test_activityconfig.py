@@ -23,3 +23,7 @@ class TestActivityConfig(TestCase):
             self.assertEqual(activity[3].action, Action.UNPARK.value)
         except Exception as e:
             self.assertFalse(True)
+
+    def test_illegal_action(self):
+        activity_configfile = os.path.join(self.TESTDIR, self._testMethodName + ".json")
+        self.assertRaisesRegexp(Exception, ".*Illegal action value: block must be one of 'park','unpark'", ActivityConfig, activity_configfile)

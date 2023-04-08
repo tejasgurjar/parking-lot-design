@@ -3,7 +3,7 @@ from enum import Enum
 from lot.lot import Lot
 from feemodel.fee_model_types import FeeModelTypes
 from feemodel.flat_fee_model import FlatFeeModel, FlatHourlyFeeModel
-from feemodel.interval_fee_model import IntervalHourlyFeeModel
+from feemodel.interval_fee_model import IntervalHourlyFeeModel, HourlyFeeModel
 from feemodel.daily_fee_model import DailyFeeModel
 
 
@@ -21,10 +21,9 @@ class LotFactory(object):
     factory_instance = None
     fee_model_map = dict({
         FeeModelTypes.FLAT_HOURLY.value: FlatHourlyFeeModel(),
-        FeeModelTypes.INTERVAL_HOURLY.value: IntervalHourlyFeeModel(),
+        FeeModelTypes.INTERVAL_HOURLY.value: HourlyFeeModel(),
         FeeModelTypes.INTERVAL_DAILY.value: DailyFeeModel()
-     }
-    )
+     })
 
     def __init__(self, config):
         self.config = config
@@ -36,7 +35,6 @@ class LotFactory(object):
         try:
             cfg_code = []
             with open(configfilepath, "r") as cfg:
-                #cfg_obj = json.load(cfg)
                 for code_line in cfg.readlines():
                     cfg_code.append(code_line)
             cfg_obj = eval("".join(cfg_code))
@@ -61,7 +59,7 @@ class LotFactory(object):
             fee_model.set_rate(self.config["lot_config"][place]["rates"])
             return fee_model
         else:
-            raise Exception("Invalid place specified:" + place + " Legal places are:" + Places.get_legal_values())
+            raise Exception("Invalid parking location specified:" + place + " Legal parking locations are:", Places.get_legal_values())
 
     def get_parking_lot(self, place):
         lot = Lot(self.get_fee_model(place),

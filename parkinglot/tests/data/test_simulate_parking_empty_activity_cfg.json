@@ -1,0 +1,9 @@
+[
+    {
+        "action": "unpark",
+        "vehicle": "motorcycle",
+        "datetime": "2022-04-01 08:00:00",
+        "ticket_id" : 0
+    }
+
+]

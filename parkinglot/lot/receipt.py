@@ -5,7 +5,7 @@ class Receipt(object):
         self.end_datetime = end_time
 
     def format_ticket_number(self):
-        return "-".join(["R", self.ticket.get_ticket_number_formatted()])
+        return "-".join(["R", self.ticket.get_ticket_number()])
 
     def get_slot_type(self):
         return self.slot_type

@@ -10,7 +10,7 @@ class FlatFeeModel(FeeModel):
     def set_rate(self, rates):
         self.rates = rates
 
-    def calculate_fee(self, duration, lot, slot_type):
+    def calculate_fee(self, duration, slot_type):
         # flat rate time spent *  rate based on place, vehicle
         time_units = self.get_time_units(duration)
         rate = self.rates[slot_type.value]

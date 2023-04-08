@@ -1,0 +1,38 @@
+[
+    {
+        "action": "park",
+        "vehicle": "motorcycle",
+        "datetime": "2022-04-01 08:00:00"
+    },
+    {
+        "action": "park",
+        "vehicle": "motorcycle",
+        "datetime": "2022-04-01 09:00:00"
+    },
+    {
+        "action": "park",
+        "vehicle": "electric_suv",
+        "datetime": "2022-04-01 09:10:12"
+    },
+    {
+        "action": "park",
+        "vehicle": "suv",
+        "datetime": "2022-04-01 10:07:00"
+    },
+    {
+        "action": "park",
+        "vehicle": "motorcycle",
+        "datetime": "2022-04-01 11:40:00"
+    },
+    {
+        "action": "park",
+        "vehicle": "car",
+        "datetime": "2022-04-01 23:59:00"
+    },
+    {
+        "action": "park",
+        "vehicle": "electric_suv",
+        "ticket_id": "3",
+        "datetime": "2022-04-01 20:40:12"
+    }
+]

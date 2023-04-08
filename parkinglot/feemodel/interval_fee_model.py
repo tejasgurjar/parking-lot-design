@@ -3,7 +3,11 @@ from math import ceil
 from datetime  import timedelta
 from feemodel.fee_model import FeeModel
 from feemodel.flat_fee_model import FlatHourlyFeeModel
-from feemodel.intervaltable.intervaltable import IntervalTable
+from feemodel.interval_table.interval_table import IntervalTable, OutOfRangeException
+
+
+def seconds_to_hours(seconds):
+    return seconds / constants.SECONDS_IN_HOUR
 
 
 class IntervalHourlyFeeModel(FeeModel):
@@ -19,14 +23,29 @@ class IntervalHourlyFeeModel(FeeModel):
         interval_table = self.rates[slot_type.value]
         return interval_table.find_interval(num_of_hours)
 
-    def calculate_fee(self, duration, lot, slot_type):
-        hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
+    def last_interval(self, slot_type):
+        interval_table = self.rates[slot_type.value]
+        return interval_table.get_last_interval()
+
+    def get_interval_value(self, interval_id, slot_type):
+        interval_table = self.rates[slot_type.value]
+        return interval_table.get_interval(interval_id)
+
+    def calculate_fee(self, duration, slot_type):
+        hours = seconds_to_hours(duration.seconds)
+
         try:
             interval_id = self.find_interval(slot_type, hours)
+            return self.calculate_fee_by_interval_id(interval_id, slot_type)
+        except Exception as e:
+            print("Error in calculation of parking fee:" + str(e))
+            raise
 
+    def calculate_fee_by_interval_id(self, interval_id, slot_type):
+        try:
             fee_sum = 0
-            for id in range(0, interval_id):
-                fee_sum += self.rates[slot_type.value].get_value(id)  # Sum up fees from previous intervals
+            for int_id in range(0, interval_id):
+                fee_sum += self.rates[slot_type.value].get_value(int_id)  # Sum up fees from previous intervals
 
             remaining_charge = self.rates[slot_type.value].get_value(interval_id)
 
@@ -40,8 +59,8 @@ class IntervalHourlyNonCumulativeFeeModel(IntervalHourlyFeeModel):
     def __init__(self):
         self.rates = None
 
-    def calculate_fee(self, duration, lot, slot_type):
-        hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
+    def calculate_fee(self, duration, slot_type):
+        hours = seconds_to_hours(duration.seconds)
         try:
             interval_id = self.find_interval(slot_type, hours)
             charge = self.rates[slot_type.value].get_value(interval_id)
@@ -75,26 +94,20 @@ class HourlyFeeModel(FeeModel):
             hourly_flat_rates[slot_type] = self.get_hourly_rate(rates, slot_type)
         self.flat_hourly_feemodel.set_rate(hourly_flat_rates)
 
-    def calculate_fee(self, duration, lot, slot_type):
-        hours = ceil(duration.seconds/constants.SECONDS_IN_HOUR)
+    def calculate_fee(self, duration, slot_type):
+        hours = seconds_to_hours(duration.seconds)
+
         try:
-            interval_id = self.find_interval(slot_type, hours)
+            interval_id = self.interval_hourly_feemodel.find_interval(slot_type, hours)
+            return self.interval_hourly_feemodel.calculate_fee_by_interval_id(interval_id, slot_type)
+        except OutOfRangeException:
+            last_interval_id = self.interval_hourly_feemodel.last_interval(slot_type)
+            lo, last_interval_id_hi = self.interval_hourly_feemodel.get_interval_value(last_interval_id, slot_type)
+            interval_fee = self.interval_hourly_feemodel.calculate_fee_by_interval_id(last_interval_id, slot_type)
 
-            fee_sum = 0
-            for id in range(0, interval_id):
-                fee_sum += self.rates[slot_type.value].get_value(id)  # Sum up fees from previous intervals
-
-            lo, hi = self.rates[slot_type.value].get_interval(interval_id)
-
-            # Calculate per hour charge if any
-            if hi is None: # signifies 'Infinity'
-                remaining_hours = (hours - lo) + 1
-                flat_charge = self.flat_hourly_feemodel.calculate_fee(timedelta(hours=remaining_hours), lot, slot_type)
-                fee_sum += remaining_hours * flat_charge
-            else:
-                fee_sum += self.rates[slot_type.value].get_value(interval_id)
-
-            return fee_sum
+            remaining_hours = ceil(max(1, (hours - last_interval_id_hi)))
+            per_hour_charge = self.flat_hourly_feemodel.calculate_fee(timedelta(hours=remaining_hours), slot_type)
+            return interval_fee + per_hour_charge
         except Exception as e:
             print("Error in calculation of parking fee:" + str(e))
             raise

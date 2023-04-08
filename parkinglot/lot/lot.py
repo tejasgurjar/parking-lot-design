@@ -76,7 +76,7 @@ class Lot(object):
             ticket = self.generate_ticket(slot_type, vehicle, start_datetime)
             return ticket
         else:
-            raise Exception("No more slots available")
+            raise Exception("No space available")
 
     def is_parking_empty(self, slot_type):
         num_available_slots = self.get_num_of_available_slots(slot_type)
@@ -85,7 +85,7 @@ class Lot(object):
 
     def calculate_fee(self, ticket, end_time):
         duration = end_time - ticket.start_datetime
-        fee = self.fee_model.calculate_fee(duration, self, ticket.get_slot_type())
+        fee = self.fee_model.calculate_fee(duration, ticket.get_slot_type())
         return fee
 
     @classmethod

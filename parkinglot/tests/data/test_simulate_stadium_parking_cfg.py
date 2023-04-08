@@ -1,8 +1,7 @@
 {
     "lot_config": {
-
-        "airport": {
-                    "fee_model": "daily",
+        "stadium": {
+                    "fee_model": "hourly",
                     "slots": {
                         "two_wheeler": 100,
                         "light_vehicle": 500,
@@ -10,16 +9,15 @@
                     },
                     "rates" : {
                         "two_wheeler" : {
-                            (0,  1): 0,
-                            (1,  8): 40,
-                            (8, 24): 60,
-                            (24, None): 80
+                            (0,  4): 30,
+                            (4,  12): 60,
+                            (12, None): 100
                         },
                         "light_vehicle" : {
-                            (0, 12): 60,
-                            (12, 24): 80,
-                            (24, None): 100
-                        },
+                            (0, 4): 60,
+                            (4, 12): 120,
+                            (12, None): 200
+                        }
                     },
         }
     }

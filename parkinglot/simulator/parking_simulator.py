@@ -35,17 +35,21 @@ class Park(Activity):
 class UnPark(Activity):
     def __init__(self, action, vehicle, datetime_string):
         super().__init__(action, vehicle, datetime_string)
-        self.slot_id = None
+        self.ticket_id = None
 
-    def set_slot_id(self, slot_id):
-        self.slot_id = slot_id
+    def set_ticket_id(self, tkt_id):
+        self.ticket_id = tkt_id
 
     def do(self, parking_space, tickets):
         slot_type = vehicle_slot_type_map[self.vehicle]
-        ticket_number = Ticket.create_formatted_ticket_number(slot_type, int(self.slot_id))
-        receipt = parking_space.free_slot(tickets[ticket_number],
-                                          self.datetime_string)
-        receipt.print()
+        ticket_number = Ticket.create_formatted_ticket_number(int(self.ticket_id))
+        if ticket_number in tickets:
+            receipt = parking_space.free_slot(tickets[ticket_number],
+                                              self.datetime_string)
+            receipt.print()
+        else:
+            raise Exception(f"Ticket number {ticket_number} was never allotted")
+
 
 class ActivityConfig(object):
     def __init__(self, configfilepath):
@@ -71,7 +75,7 @@ class ActivityConfig(object):
     def validate_action(cls, action):
         if action.upper() not in Action.__members__:
             err_msg = "Illegal action value: " + action + \
-                      " must be " + "".join([i for i in Action.__members__])
+                      " must be one of " + ",".join(["'" + i.lower() + "'" for i in Action.__members__])
             raise Exception(err_msg)
         return True
 
@@ -137,7 +141,7 @@ class ActivityConfig(object):
                 activity_obj = UnPark(act_cfg[ACTION],
                                       act_cfg[VEHICLE],
                                       act_cfg[DATETIME])
-                activity_obj.set_slot_id(act_cfg[TICKET_ID])
+                activity_obj.set_ticket_id(act_cfg[TICKET_ID])
                 activity_objs.append(activity_obj)
         return activity_objs
 
