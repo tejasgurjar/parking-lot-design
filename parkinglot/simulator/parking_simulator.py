@@ -3,6 +3,7 @@ import datetime
 
 from enum import Enum
 from config.vehicle_slot_type_cfg import *
+from lot.lot_factory import Places
 from lot.ticket import Ticket
 from constants import *
 
@@ -84,7 +85,7 @@ class ActivityConfig(object):
     def validate_vehicle(cls, vehicle):
         assert vehicle.lower() in vehicle_slot_type_map, \
                                  "Illegal vehicle type: " + vehicle + \
-                                  "must be one of " + "".join(vehicle_slot_type_map.keys())
+                                  "must be one of " + ",".join(vehicle_slot_type_map.keys())
 
     @classmethod
     def validate_datetime(cls, datetimestring):
@@ -97,10 +98,14 @@ class ActivityConfig(object):
             return False
 
     def validate(self):
+
+        if LOCATION not in self.config:
+            raise Exception(LOCATION + " not specified: Specify one of ", Places.get_legal_values())
+
         common_mandatory_params = [ACTION, VEHICLE, DATETIME]
         errors = list()
 
-        for act_id, activity in enumerate(self.config):
+        for act_id, activity in enumerate(self.config[ACTIVITY]):
             mandatory_params = common_mandatory_params[:]
 
             if activity[ACTION].lower() == Action.UNPARK.value:
@@ -131,7 +136,7 @@ class ActivityConfig(object):
     def get_activity(self):
         activity_objs = []
 
-        for act_cfg in self.config:
+        for act_cfg in self.config[ACTIVITY]:
             if act_cfg[ACTION].lower() == Action.PARK.value:
                 activity_objs.append(Park(act_cfg[ACTION],
                                           act_cfg[VEHICLE],
@@ -145,13 +150,12 @@ class ActivityConfig(object):
                 activity_objs.append(activity_obj)
         return activity_objs
 
+    def get_location(self):
+        return self.config[LOCATION]
 
 class ParkingSimulator(object):
-    def __init__(self, lot, activity_config_filepath):
+    def __init__(self, lot, activity_config):
         self.lot = lot
-
-        activity_config = ActivityConfig(activity_config_filepath)
-        activity_config.validate()
         self.activities = activity_config.get_activity()
 
     def simulate(self):

@@ -12,7 +12,7 @@ class Receipt(object):
 
     def print(self):
         print("Receipt: " + self.format_ticket_number())
-        print("  Parking Lot:" + self.ticket.lot.place)
+        print("  Parking Lot:" + self.ticket.lot.get_location())
         print("  Vehicle Type: " + self.ticket.vehicle)
         print("  Entry date time:" + self.ticket.start_datetime.isoformat())
         print("  Exit date time:" + self.end_datetime.isoformat())

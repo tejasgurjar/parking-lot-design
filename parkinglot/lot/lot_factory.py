@@ -14,7 +14,7 @@ class Places(Enum):
 
     @classmethod
     def get_legal_values(cls):
-        return [i for i in Places.__members__]
+        return [i.lower() for i in Places.__members__]
 
 
 class LotFactory(object):
@@ -25,8 +25,9 @@ class LotFactory(object):
         FeeModelTypes.INTERVAL_DAILY.value: DailyFeeModel()
      })
 
-    def __init__(self, config):
+    def __init__(self, config, location):
         self.config = config
+        self.location = location
 
     @classmethod
     def load_config(cls, configfilepath):
@@ -45,10 +46,10 @@ class LotFactory(object):
             return cfg_obj
 
     @classmethod
-    def get_instance(cls, configfilepath):
+    def get_instance(cls, configfilepath, location):
         if cls.factory_instance is None:
             config = LotFactory.load_config(configfilepath)
-            cls.factory_instance = LotFactory(config)
+            cls.factory_instance = LotFactory(config, location)
 
         return cls.factory_instance
 
@@ -61,8 +62,9 @@ class LotFactory(object):
         else:
             raise Exception("Invalid parking location specified:" + place + " Legal parking locations are:", Places.get_legal_values())
 
-    def get_parking_lot(self, place):
-        lot = Lot(self.get_fee_model(place),
-                  self.config["lot_config"][place]["slots"],
-                  place=place)
+    def get_parking_lot(self):
+        lot = Lot(self.get_fee_model(self.location),
+                  self.config["lot_config"][self.location]["slots"],
+                  self.location)
+
         return lot

@@ -17,7 +17,6 @@ class TestActivityConfig(TestCase):
         activity_configfile = os.path.join(self.TESTDIR, "activity1.json")
         try:
             act_cfg = ActivityConfig(activity_configfile)
-            self.assertTrue(True)
             activity = act_cfg.get_activity()
             self.assertEqual(activity[0].action, Action.PARK.value)
             self.assertEqual(activity[3].action, Action.UNPARK.value)

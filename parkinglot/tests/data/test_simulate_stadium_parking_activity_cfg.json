@@ -1,4 +1,6 @@
-[
+{
+    "location": "stadium",
+    "activity" : [
     {
         "action": "park",
         "vehicle": "motorcycle",
@@ -44,4 +46,5 @@
         "datetime": "2022-04-01 23:12:00",
         "ticket_id" : "4"
     }
-]
+    ]
+}

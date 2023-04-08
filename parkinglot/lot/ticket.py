@@ -35,7 +35,7 @@ class Ticket(object):
 
     def print(self):
         print("Ticket:" + self.ticket_number_formatted)
-        print("  Parking Lot:" + self.lot.place)
+        print("  Parking Lot:" + self.lot.get_location())
         print("  Slot number:" + self.slot_number_formatted)
         print("  Vehicle Type: " + self.vehicle)
         print("  Entry date time:" + self.start_datetime.isoformat())

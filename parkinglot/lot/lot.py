@@ -6,7 +6,7 @@ from lot.vehicle_slot import SlotType
 
 
 class Lot(object):
-    def __init__(self, fee_model, slot_capacity_cfg, place):
+    def __init__(self, fee_model, slot_capacity_cfg, location):
         self.fee_model = fee_model
         self.slot_capacity_cfg = slot_capacity_cfg
         self.next_ticket_number = 1
@@ -30,13 +30,16 @@ class Lot(object):
         }
 
         self.tickets_created = dict()
-        self.place = place
+        self.location = location
 
     def increment_ticket_number(self):
         self.next_ticket_number += 1
 
     def get_fee_model(self):
         return self.fee_model
+
+    def get_location(self):
+        return self.location
 
     def get_next_ticket_number(self):
         ticket_number = self.next_ticket_number
