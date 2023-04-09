@@ -1,7 +1,8 @@
 import os
 import sys
-from lot.lot_factory import LotFactory, Places
-from simulator.parking_simulator import ParkingSimulator, ActivityConfig
+from lot.lot_factory import LotFactory
+from simulator.parking_simulator import ParkingSimulator
+from simulator.activity import ActivityConfig
 
 
 def manage_parking(lot_cfgfile, parking_activity_cfgfile):

@@ -5,7 +5,7 @@ from feemodel.interval_fee_model import IntervalHourlyFeeModel, HourlyFeeModel
 from feemodel.daily_fee_model import DailyFeeModel
 from lot.vehicle_slot import SlotType
 from lot.lot import Lot
-from lot.lot_factory import Places
+from lot.locations import Locations
 
 
 class TestFeeModel(TestCase):
@@ -107,7 +107,7 @@ class TestFeeModel(TestCase):
         exit_time = datetime.datetime.fromisoformat("2023-01-01 16:10:00")
         duration = exit_time - entry_time
 
-        parking_space = Lot(fee_model, self.mall_slots, Places.MALL.value)
+        parking_space = Lot(fee_model, self.mall_slots, Locations.MALL.value)
         fee = fee_model.calculate_fee(duration, SlotType.LV)
         self.assertEqual(60, fee)
 
@@ -119,7 +119,7 @@ class TestFeeModel(TestCase):
         exit_time = datetime.datetime.fromisoformat("2023-01-01 18:10:53")
         duration = exit_time - entry_time
 
-        parking_space = Lot(fee_model, self.stadium_slots, Places.STADIUM.value)
+        parking_space = Lot(fee_model, self.stadium_slots, Locations.STADIUM.value)
         two_wheel_fee = fee_model.calculate_fee(duration, SlotType.TWO_WHEELER)
         lmv_fee = fee_model.calculate_fee(duration, SlotType.LV)
         self.assertEqual(115, two_wheel_fee)
@@ -133,7 +133,7 @@ class TestFeeModel(TestCase):
         exit_time = datetime.datetime.fromisoformat("2023-01-02 06:10:53")
         duration = exit_time - entry_time
 
-        parking_space = Lot(fee_model, self.stadium_slots, Places.STADIUM.value)
+        parking_space = Lot(fee_model, self.stadium_slots, Locations.STADIUM.value)
         two_wheel_fee = fee_model.calculate_fee(duration, SlotType.TWO_WHEELER)
         lmv_fee = fee_model.calculate_fee(duration, SlotType.LV)
         self.assertEqual(560, two_wheel_fee)
@@ -147,7 +147,7 @@ class TestFeeModel(TestCase):
         exit_time = datetime.datetime.fromisoformat("2023-01-01 19:00:00")
         duration = exit_time - entry_time
 
-        parking_space = Lot(fee_model, self.stadium_slots, Places.STADIUM.value)
+        parking_space = Lot(fee_model, self.stadium_slots, Locations.STADIUM.value)
         two_wheel_fee = fee_model.calculate_fee(duration, SlotType.TWO_WHEELER)
         lmv_fee = fee_model.calculate_fee(duration, SlotType.LV)
         self.assertEqual(60, two_wheel_fee)
@@ -162,7 +162,7 @@ class TestFeeModel(TestCase):
         duration = exit_time - entry_time
         print("Duration:", duration.seconds)
 
-        parking_space = Lot(fee_model, self.airport_slots, Places.AIRPORT.value)
+        parking_space = Lot(fee_model, self.airport_slots, Locations.AIRPORT.value)
 
         two_wheel_fee = fee_model.calculate_fee(duration, SlotType.TWO_WHEELER)
         lmv_fee = fee_model.calculate_fee(duration, SlotType.LV)

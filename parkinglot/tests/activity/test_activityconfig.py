@@ -1,7 +1,8 @@
 import os
 from unittest import TestCase
-from simulator.parking_simulator import ActivityConfig, Action
+from simulator.activity import ActivityConfig, Action
 from constants import *
+
 
 class TestActivityConfig(TestCase):
     TESTDIR = "tests/data"

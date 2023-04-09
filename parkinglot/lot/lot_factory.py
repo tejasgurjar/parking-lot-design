@@ -1,20 +1,9 @@
 import os
-from enum import Enum
 from lot.lot import Lot
 from feemodel.fee_model_types import FeeModelTypes
-from feemodel.flat_fee_model import FlatFeeModel, FlatHourlyFeeModel
-from feemodel.interval_fee_model import IntervalHourlyFeeModel, HourlyFeeModel
+from feemodel.flat_fee_model import FlatHourlyFeeModel
+from feemodel.interval_fee_model import HourlyFeeModel
 from feemodel.daily_fee_model import DailyFeeModel
-
-
-class Places(Enum):
-    AIRPORT="airport"
-    MALL="mall"
-    STADIUM="stadium"
-
-    @classmethod
-    def get_legal_values(cls):
-        return [i.lower() for i in Places.__members__]
 
 
 class LotFactory(object):
@@ -28,6 +17,7 @@ class LotFactory(object):
     def __init__(self, config, location):
         self.config = config
         self.location = location
+
 
     @classmethod
     def load_config(cls, configfilepath):
