@@ -110,5 +110,5 @@ class Lot(object):
         fee = self.calculate_fee(ticket, end_time)
 
         # Add slot back to available pool
-        heapq.heappush(self.available_slots[slot_type], ticket.id)
+        heapq.heappush(self.available_slots[slot_type], ticket.slot_id)
         return Receipt(ticket, end_time, fee)

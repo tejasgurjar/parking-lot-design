@@ -2,7 +2,7 @@ class Ticket(object):
     def __init__(self, id, slot_id, slot_type, vehicle, lot, entry_datetime):
         self.id = id
         self.slot_id = slot_id
-        self.slot_number_formatted = Ticket.create_formatted_slot_number(slot_id)
+        self.slot_number_formatted = Ticket.create_formatted_slot_number(slot_type.name, slot_id)
         self.ticket_number = Ticket._get_ticket_number(id)
         self.ticket_number_formatted = Ticket.create_formatted_ticket_number(id)
         self.vehicle = vehicle
@@ -16,8 +16,8 @@ class Ticket(object):
         return self.ticket_number_formatted
 
     @classmethod
-    def create_formatted_slot_number(cls, slot_id):
-        return "-".join(["S", "%05d" % slot_id])
+    def create_formatted_slot_number(cls, slot_type, slot_id):
+        return "-".join(["S", slot_type, "%05d" % slot_id])
 
     @classmethod
     def _get_ticket_number(cls, id):

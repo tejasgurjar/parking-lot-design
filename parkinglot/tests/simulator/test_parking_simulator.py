@@ -1,5 +1,5 @@
 import os
-from unittest import TestCase
+from unittest import TestCase, skip
 from tests.common import *
 from lot.lot_factory import LotFactory
 from lot.locations import Locations
@@ -8,10 +8,8 @@ from simulator.activity import ActivityConfig
 
 
 class TestParkingSimulator(TestCase):
-
     def setUp(self):
         self.activity_cfg = ActivityConfig(os.path.join(TESTDIR, self._testMethodName + "_activity_cfg.json"))
-
 
     def tearDown(self):
         LotFactory.factory_instance = None
@@ -25,6 +23,15 @@ class TestParkingSimulator(TestCase):
         sim = ParkingSimulator(lot, self.activity_cfg)
         sim.simulate()
 
+        self.assertTrue(True)
+
+    def test_simulate_mall_parking2(self):
+        parking_space_cfgfile = os.path.join(TESTDIR, self._testMethodName + "_cfg.py")
+
+        lot_factory = LotFactory.get_instance(parking_space_cfgfile, Locations.MALL.value)
+        lot = lot_factory.get_parking_lot()
+        sim = ParkingSimulator(lot, self.activity_cfg)
+        sim.simulate()
         self.assertTrue(True)
 
     def test_simulate_airport_parking(self):
